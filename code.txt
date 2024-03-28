@@ -1,0 +1,39 @@
+#Import necessary libraries
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix
+import pandas as pd
+
+#Load your dataset
+df = pd.read_csv('C:\\Users\\Admin\\Desktop\\prog\\python\\caravan.csv')
+
+#Convert non-numeric values to numeric ones
+df = pd.get_dummies(df)
+
+#Print the number of predictors (features), the number of samples, the number of classes
+print("Number of predictors: ", df.shape[1] - 1)
+print("Number of samples: ", df.shape[0])
+print("Number of classes: ", df['MGEMLEEF'].nunique())
+
+#Split the data into training and test sets
+train, test = train_test_split(df, test_size=1000)
+
+#Separate predictors and target
+X_train = train.drop('MGEMLEEF', axis=1)
+y_train = train['MGEMLEEF']
+X_test = test.drop('MGEMLEEF', axis=1)
+y_test = test['MGEMLEEF']
+
+#Fit the kNN model on the training data using k = 3
+knn = KNeighborsClassifier(n_neighbors=3)
+knn.fit(X_train, y_train)
+
+#Use the testing set to assess the performance of the model
+y_pred = knn.predict(X_test)
+print("Confusion matrix: \n", confusion_matrix(y_test, y_pred))
+
+#Apply kNN for values k = {1,2,...5}
+for k in range(1, 6):
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(X_train, y_train)
+    print("Accuracy for k =", k, "is:", knn.score(X_test, y_test))
